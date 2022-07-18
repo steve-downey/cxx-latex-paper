@@ -1,0 +1,31 @@
+#+options: ':nil *:t -:t ::t <:t H:3 \n:nil ^:t arch:headline author:t
+#+options: broken-links:nil c:nil creator:nil d:(not "LOGBOOK") date:t e:t
+#+options: email:nil f:t inline:t num:t p:nil pri:nil prop:nil stat:t tags:t
+#+options: tasks:t tex:t timestamp:t title:t toc:t todo:t |:t
+#+title: README
+#+date: <2021-12-03 Fri>
+#+author: Steve Downey
+#+email: sdowney@sdowney.org
+#+language: en
+#+select_tags: export
+#+exclude_tags: noexport
+#+creator: Emacs 28.0.60 (Org mode 9.5.1)
+#+cite_export:
+#+options: html-link-use-abs-url:nil html-postamble:auto html-preamble:t
+#+options: html-scripts:nil html-style:t html5-fancy:nil tex:t
+#+html_doctype: xhtml-strict
+#+html_container: div
+#+html_content_class: content
+#+description:
+#+keywords:
+#+html_link_home:
+#+html_link_up:
+#+html_mathjax:
+#+html_equation_reference_format: \eqref{%s}
+#+html_head: <link rel="stylesheet" type="text/css" href="http://sdowney.org/css/smd-zenburn.css" />
+#+infojs_opt:
+#+latex_header:
+
+Using the C++ Standard Draft macros and styles for writing WG21 Papers.
+
+Work in Progress.
