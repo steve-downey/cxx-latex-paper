@@ -1,0 +1,12 @@
+*.out
+*.log
+*.aux
+*.fls
+*.toc
+*.fdb_latexmk
+build/
+_region_.tex
+_minted*/
+.venv/
+*.pdf
+wg21.bib

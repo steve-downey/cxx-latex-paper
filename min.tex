@@ -1,0 +1,154 @@
+\documentclass[a4paper,10pt,oneside,openany,final,article]{memoir}
+\input{common}
+\settocdepth{chapter}
+\usepackage[outputdir=build]{minted}
+\usepackage{fontspec}
+\setromanfont{Source Serif Pro}
+\setsansfont{Source Sans Pro}
+\setmonofont{Source Code Pro}
+
+\begin{document}
+\title{The Title of My Thing: \tcode{std::thing}}
+\author{
+  Steve Downey \small(\href{mailto:sdowney@gmail.com}{sdowney@gmail.com}) \\
+}
+\date{} %unused. Type date explicitly below.
+\maketitle
+
+\begin{flushright}
+  \begin{tabular}{ll}
+    Document \#: & PnnnnRn \\
+    Date: & \today \\
+    Project: & Programming Language C++ \\
+    Audience: & LEWG
+  \end{tabular}
+\end{flushright}
+
+\begin{abstract}
+  This paper proposes \tcode{std::thing} a permanent solution for the Yancy Street boys.
+\end{abstract}
+
+\tableofcontents*
+
+\chapter{Before / After Table}
+\begin{tabular}{ ll }
+  \begin{minipage}[t]{0.45\columnwidth}
+    \begin{minted}[fontsize=\footnotesize]{c++}
+      {
+        // A Terrible Battle
+      }
+
+    \end{minted}
+  \end{minipage}
+  &
+    \begin{minipage}[t]{0.45\columnwidth}
+      \begin{minted}[fontsize=\footnotesize]{c++}
+        std::thing t;
+        t.clobber();
+      \end{minted}
+    \end{minipage}
+  \\ \midrule
+  \begin{minipage}[t]{0.45\columnwidth}
+    \begin{minted}[fontsize=\footnotesize]{c++}
+      // A Global Battle
+    \end{minted}
+  \end{minipage}
+  &
+    \begin{minipage}[t]{0.45\columnwidth}
+      \begin{minted}[fontsize=\footnotesize]{c++}
+        std::thing{}.clobber();
+      \end{minted}
+    \end{minipage}
+\end{tabular}
+
+\chapter{Motivation}
+
+The distance between what we provide to the editors and what they need to edit the standard is too large. Working with \LaTeX\space can reduce that distance, especially if we use the markup used by the draft standard, or at least a subset of it.
+
+\LaTeX\space is more verbose and the dialect used for the C++ standard has semantics in addition to the typographic markup. However, providing accurate editing instructions by way of emphasis, italics, and choice of font, is difficult without using the same markup language and markup macros. The cost of writing \LaTeX\space may be too high before writing Wording, but I now think it is worthwhile to convert a paper, preserving the design and history, into \LaTeX\space and writing the wording using the same markup the standard itself does.
+
+
+\begin{minipage}[t]{0.45\columnwidth}
+  \begin{minted}{c++}
+    // the dreaded for-while loop
+    for (; first != last; ++first) {
+      std::cout << *first;
+    } while(++first != last);
+
+  \end{minted}
+\end{minipage}
+
+
+
+
+\chapter{More Things}
+
+All the things
+
+\chapter{Proposal}
+
+Add the awsome \tcode{std::thing} which will \tcode{clobber} all the problems.
+
+
+\chapter{Design}
+
+Rocky.
+
+\chapter{Implementation}
+
+A Horror.
+
+\chapter{Wording}
+\begin{wording}
+
+  \Sec1[thing.synopsis]{Synopsis}
+
+
+  Modify 26.2 Header <ranges> synopsis
+
+  \begin{addedblock}
+    \begin{codeblock}
+      // \ref{range.maybe}, maybe view
+      template<copy_constructible T>
+      requires @\seebelow@;
+      class thing_view;
+
+      template <typename T>
+      constexpr inline bool enable_borrowed_range<thing_view<T*>> = true;
+
+      namespace views { inline constexpr @\unspec@ maybe = @\unspec@; }
+    \end{codeblock}
+  \end{addedblock}
+
+  \Sec2[range.thing]{Thing View}
+
+  \Sec3[range.thing.overview]{Overview}
+
+  \pnum
+  \tcode{thing_view} is a range adaptor that produces a \libconcept{view} with cardinality 0 or 1. It adapts \libconcept{copyable} object types and \exposid{nullable} types. If the type is \exposid{nullable}, the view is empty if the \exposid{nullable} is empty.
+
+
+
+\end{wording}
+\chapter{Impact on the standard}
+
+A pure library extension, affecting no other parts of the library or language.
+
+The proposed changes are relative to the current working draft~\cite{N4910}.
+
+\chapter*{Document history}
+
+\begin{itemize}
+\item \textbf{Changes since R0}
+  \begin{itemize}
+  \item Remove Hulk references
+  \end{itemize}
+\end{itemize}
+
+\renewcommand{\bibname}{References}
+\bibliographystyle{abstract}
+\bibliography{wg21,mybiblio}
+
+\nocite{thing_xyzzy:online}
+
+\end{document}

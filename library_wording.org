@@ -1,0 +1,42 @@
+#+OPTIONS: ':nil *:t -:t ::t <:t H:3 \n:nil ^:nil arch:headline author:nil
+#+OPTIONS: broken-links:nil c:nil creator:nil d:(not "LOGBOOK") date:nil e:t
+#+OPTIONS: email:nil f:t inline:t num:2 p:nil pri:nil prop:nil stat:t tags:t
+#+OPTIONS: tasks:t tex:t timestamp:t title:t toc:nil todo:t |:t
+#+TITLE: C++ Wording Techniques
+#+AUTHOR: Steve Downey
+#+EMAIL: sdowney2@bloomberg.net, sdowney@gmail.com
+#+LANGUAGE: en
+#+SELECT_TAGS: export
+#+EXCLUDE_TAGS: noexport
+#+LATEX_CLASS: article
+#+LATEX_CLASS_OPTIONS:
+#+LATEX_HEADER:
+#+LATEX_HEADER_EXTRA:
+#+DESCRIPTION:
+#+KEYWORDS:
+#+SUBTITLE:
+#+LATEX_COMPILER: pdflualatex
+#+DATE: <2022-07-17 Sun>
+#+STARTUP: showall
+#+OPTIONS: html-link-use-abs-url:nil html-postamble:nil html-preamble:t
+#+OPTIONS: html-scripts:t html-style:t html5-fancy:nil tex:t
+#+HTML_DOCTYPE: xhtml-strict
+#+HTML_CONTAINER: div
+#+DESCRIPTION:
+#+KEYWORDS:
+#+HTML_LINK_HOME:
+#+HTML_LINK_UP:
+#+HTML_MATHJAX:
+#+HTML_HEAD:
+#+HTML_HEAD_EXTRA:
+#+SUBTITLE:
+#+INFOJS_OPT:
+
+#+BEGIN_ABSTRACT
+Abstract: Writing library wording with LaTeX, the std macros, and the current conventions.
+#+END_ABSTRACT
+
+* Motivation
+The distance between what we provide to the editors and what they need to edit the standard is too large. Working with LaTeX can reduce that distance, especially if we use the markup used by the draft standard, or at least a subset of it.
+
+LaTex is more verbose and the dialect used for the C++ standard has semantics in addition to the typographic markup. However, providing accurate editing instructions by way of emphasis, italics, and choice of font, is difficult without using the same markup language and markup macros. The cost of writing LaTeX may be too high before writing Wording, but I now think it is worthwhile to convert a paper, preserving the design and history, into LaTeX and writing the wording using the same markup the standard itself does.
