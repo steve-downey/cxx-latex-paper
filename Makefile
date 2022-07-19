@@ -19,13 +19,13 @@ create-venv:
 	rm -rf $(VENV)
 	make $(VENV)
 
-
-override PDF := $(SRC:.tex=.pdf)
+override SRC := min.tex
+override PDF := build/$(SRC:.tex=.pdf)
 .PHONY: pdf
 pdf: $(PDF)
 
-%.pdf: %.tex wg21.bib | $(VENV)
-	$(SOURCE_VENV) latexmk --shell-escape $<
+build/%.pdf: %.tex wg21.bib | $(VENV)
+	$(SOURCE_VENV) latexmk -shell-escape $<
 
 wg21.bib:
 	curl https://wg21.link/index.bib > wg21.bib
