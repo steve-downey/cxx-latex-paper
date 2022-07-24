@@ -8,7 +8,6 @@ DOCKER_CMD := docker volume create cmake.bld; docker-compose run --rm dev
 LOCAL_MAKE_CMD := make -e -f targets.mk
 MAKE_CMD := $(LOCAL_MAKE_CMD)
 REQS_MARKER := $(VENV)/bin/.pip-sync
-SRC ?= min.tex
 # These targets are only run locally
 LOCAL_ONLY_TARGETS :=
 
@@ -28,7 +27,7 @@ endif
 
 
 .DEFAULT:
-	$(MAKE_CMD) $@ SRC=$(SRC)
+	$(MAKE_CMD) $@
 
 # These targets that should only be run locally.
 $(LOCAL_ONLY_TARGETS):

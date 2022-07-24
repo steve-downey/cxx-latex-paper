@@ -10,3 +10,5 @@ _minted*/
 .venv/
 *.pdf
 wg21.bib
+*.bbl
+*.blg

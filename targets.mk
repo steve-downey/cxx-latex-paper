@@ -1,4 +1,4 @@
-VENV := ../.venv
+VENV := .venv/
 SOURCE_VENV := . $(VENV)/bin/activate;
 PYEXEC := $(SOURCE_VENV) python
 PIP_SYNC := $(PYEXEC) -m piptools sync
@@ -20,19 +20,11 @@ create-venv:
 	rm -rf $(VENV)
 	make $(VENV)
 
-# SRC ?= min.tex
-S := $(SRC)
-PDF ?= $(SRC:.tex=.pdf)
-.PHONY: pdf
-pdf: $(PDF)
-	echo SRC : $(SRC)
-	echo $(PDF)
-
-CACHE_TEXIMPORTS=$(TEXIMPORTS)
-%.pdf: export TEXINPUTS=.:../:$(CACHE_TEXIMPORTS)
-%.pdf: %.tex wg21.bib | $(VENV)
-	-mkdir build
-	cd build && $(SOURCE_VENV) latexmk -shell-escape -pdflua ../$<
+%.pdf : %.tex wg21.bib | $(VENV)
+	$(SOURCE_VENV) latexmk -shell-escape -pdflua  $<
 
 wg21.bib:
 	curl https://wg21.link/index.bib > wg21.bib
+
+clean:
+	latexmk -c
