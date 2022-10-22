@@ -6,6 +6,7 @@ PYEXECPATH ?= $(shell which python3.9 || which python3.9 || which python3.8 || w
 PYTHON ?= $(shell basename $(PYEXECPATH))
 REQS_MARKER := $(VENV)/bin/.pip-sync
 PIP := $(PYEXEC) -m pip
+DEPS_DIR := .deps
 
 override DEPS := $(VENV) wg21.bib
 
@@ -20,11 +21,24 @@ create-venv:
 	rm -rf $(VENV)
 	make $(VENV)
 
-%.pdf : %.tex wg21.bib | $(VENV)
-	$(SOURCE_VENV) latexmk -shell-escape -pdflua  $<
+%.pdf : %.tex ## Make PDF from TeX
+%.pdf : %.tex wg21.bib  $(DEPS_DIR)/%.d | $(VENV) $(DEPS_DIR) ## Make PDF
+	$(SOURCE_VENV) latexmk -shell-escape -pdflua -g -use-make -deps -deps-out=$(DEPS_DIR)/$@.d -MP $<
+
+$(filter %.pdf,$(MAKECMDGOALS)) : %.pdf : %.tex
+	$(SOURCE_VENV) latexmk -shell-escape -pdflua -g -use-make -deps -deps-out=$(DEPS_DIR)/$@.d -MP $<
+
+$(DEPS_DIR): ; @mkdir -p $@
+ALLTEX := $(wildcard *.tex)
+DEPFILES := $(ALLTEX:%.tex=$(DEPS_DIR)/%.pdf.d)
+$(DEPFILES):
+
+include $(DEPFILES)
 
 wg21.bib:
 	curl https://wg21.link/index.bib > wg21.bib
 
 clean:
 	latexmk -c
+
+print-%  : ; @echo $* = $($*)

@@ -27,6 +27,7 @@ endif
 
 
 .DEFAULT:
+	echo Default Target Running for $@
 	$(MAKE_CMD) $@
 
 # These targets that should only be run locally.
@@ -67,3 +68,8 @@ help: ## Show this help.
 
 wg21.bib:
 	curl https://wg21.link/index.bib > wg21.bib
+
+%.pdf: FORCE
+	$(MAKE_CMD) $@
+
+FORCE:
