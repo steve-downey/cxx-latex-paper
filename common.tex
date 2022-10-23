@@ -94,12 +94,5 @@
 %% turn off all ligatures inside \texttt
 \DisableLigatures{encoding = T1, family = tt*}
 
-%% --------------------------------------------------
-%% configuration
-% \input{stdtex/config}
-
-\makepagestyle{paperpage}
-\makeevenfoot{paperpage}{\leftmark}{}{\thepage}
-\makeoddfoot{paperpage}{\leftmark}{}{\thepage}
-
-\aliaspagestyle{chapter}{paperpage}
+\pagestyle{simple}
+\aliaspagestyle{chapter}{simple}
