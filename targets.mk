@@ -25,7 +25,7 @@ create-venv:
 %.pdf : %.tex wg21.bib  $(DEPS_DIR)/%.d | $(VENV) $(DEPS_DIR) ## Make PDF
 	$(SOURCE_VENV) latexmk -shell-escape -pdflua -g -use-make -deps -deps-out=$(DEPS_DIR)/$@.d -MP $<
 
-$(filter %.pdf,$(MAKECMDGOALS)) : %.pdf : %.tex
+$(filter %.pdf,$(MAKECMDGOALS)) : %.pdf : %.tex | $(VENV) $(DEPS_DIR)
 	$(SOURCE_VENV) latexmk -shell-escape -pdflua -g -use-make -deps -deps-out=$(DEPS_DIR)/$@.d -MP $<
 
 $(DEPS_DIR): ; @mkdir -p $@
