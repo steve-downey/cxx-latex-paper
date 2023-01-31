@@ -1,0 +1,119 @@
+\documentclass[a4paper,10pt,oneside,openany,final,article]{memoir}
+\input{common}
+\settocdepth{chapter}
+\usepackage{minted}
+\usepackage{fontspec}
+\setromanfont{Source Serif Pro}
+\setsansfont{Source Sans Pro}
+\setmonofont{Source Code Pro}
+\usepackage{draftwatermark}
+\SetWatermarkText{\textsc{DRAFT}}
+\SetWatermarkColor[gray]{0.9}
+
+\begin{document}
+\title{pmr::generator - Promise Types are not Values}
+\author{
+  Steve Downey \small(\href{mailto:sdowney@gmail.com}{sdowney@gmail.com}) \small(\href{mailto:sdowney2@bloomberg.net}{sdowney2@bloomberg.net}) \\
+}
+\date{} %unused. Type date explicitly below.
+\maketitle
+
+\begin{flushright}
+\begin{tabular}{ll}
+Document \#: & DnnnnR0 \\
+Date: & \today \\
+Project: & Programming Language C++ \\
+Audience: & LEWG, LWG
+\end{tabular}
+\end{flushright}
+
+\begin{abstract}
+  The type returned from a coroutine is not a value semantic container.
+  It nonetheless can satisfy the requirements for supporting pmr generators.
+  It is useful to provide a pmr alias to make the requirement to use pmr allocators visible in the typesystem.
+\end{abstract}
+
+\tableofcontents*
+
+\chapter{What is being proposed}
+Provide a template alias for std::generator that changes the default from an erased allocator to a pmr::allocator to facilitate enforcing business rules and semantic requirements in the typesytem.
+
+
+\chapter{Before / After Table}
+\begin{tabular}{ ll }
+  \begin{minipage}[t]{0.45\columnwidth}
+    \begin{minted}[fontsize=\footnotesize]{c++}
+      std::pmr::monotonic_buffer_resource mbr;
+      std::pmr::polymorphic_allocator<int> pa{&mbr};
+
+      std::generator<
+          int,
+          void,
+          std::pmr::polymorphic_allocator<int>> g
+            = pmr_requiring_coroutine(
+                std::allocator_arg,
+                pa);
+    \end{minted}
+  \end{minipage}
+  &
+    \begin{minipage}[t]{0.45\columnwidth}
+      \begin{minted}[fontsize=\footnotesize]{c++}
+        std::pmr::monotonic_buffer_resource mbr;
+        std::pmr::polymorphic_allocator<int> pa{&mbr};
+
+        std::pmr::generator<int> g
+          = pmr_requiring_coroutine(
+              std::allocator_arg, pa
+          );
+      \end{minted}
+    \end{minipage}
+\end{tabular}
+
+\chapter{pmr is not pocma}
+Value semantic container types must be able to propagate their allocator and extend their move and move assignment to copy from one memory arena into another. They should ensure that the objects they contain are given the allocator they hold in order to ensure consistency of allocator scope.
+
+Coroutine types do none of that. They do no allocation beyond the initial allocation of the corouting frame and any housekeeping state used to manage deallocation. They, quite properly, do not advertise an \tcode{allocator_type} suggesting that they are \tcode{Allocator Aware}. They are not.
+
+The \tcode{co_awaitable} returned from a coroutine has a handle to an uncopyable and immovable coroutine frame. The \tcode{coroutine_handle} has pointer semantics, a reference semantic type with value semantics. The promise type it is coupled with will often have smart pointer like semantics. However this all is significant during the creation of the the awaitable that controls the coroutine, and at its destruction. Allocation is not part of the operations modeled by the awaitable.
+
+In particular the usage of the allocator that was passed into the coroutine that acts as the factory for the awaitable is not relevant and outside the span of control of the awaitable. That is to say it is not the concern of the generator if the string it produces uses the allocator.
+
+The design intent of the pmr namespace is to make usaage of pmr the default and to make that usage visible in the typesystem. It is not merely for allocator aware value types with an allocator template parameter that can be made to use pmr::allocator.
+
+Anyone working with pmr allocators will eventually create the proposed alias, if just to avoid having to explain the second template parameter for generator. The standard should provide this to avoid the utterly needless creativity.
+
+\chapter{Wording}
+
+The proposed changes are relative to the current working draft \cite{N4917}.
+
+\begin{wording}
+
+  \begin{codeblock}
+    namespace std {
+      // \ref{coro.generator.class}, class template \tcode{generator}
+      template<class Ref, class V = void, class Allocator = void>
+      class generator;
+    \end{codeblock}
+
+
+    \begin{addedblock}
+    \begin{codeblock}
+      namespace pmr {
+        template<class R, class V = void>
+        using generator = std::generator<R, V, polymorphic_allocator<R>>;
+      }
+    \end{codeblock}
+    \end{addedblock}
+
+    \begin{codeblock}
+    }
+  \end{codeblock}
+
+\end{wording}
+
+\renewcommand{\bibname}{References}
+\bibliographystyle{abstract}
+\bibliography{wg21, mybiblio}
+
+
+\end{document}
