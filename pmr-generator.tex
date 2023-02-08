@@ -17,7 +17,7 @@
 
 \begin{flushright}
 \begin{tabular}{ll}
-Document \#: & P2787R0 \\
+Document \#: & P2787R1 \\
 Date: & \today \\
 Project: & Programming Language C++ \\
 Audience: & LEWG, LWG
@@ -41,12 +41,12 @@ Provide a template alias for std::generator that changes the default from an era
   \begin{minipage}[t]{0.45\columnwidth}
     \begin{minted}[fontsize=\footnotesize]{c++}
       std::pmr::monotonic_buffer_resource mbr;
-      std::pmr::polymorphic_allocator<int> pa{&mbr};
+      std::pmr::polymorphic_allocator<> pa{&mbr};
 
       std::generator<
           int,
           void,
-          std::pmr::polymorphic_allocator<int>> g
+          std::pmr::polymorphic_allocator<>> g
             = pmr_requiring_coroutine(
                 std::allocator_arg,
                 pa);
@@ -56,7 +56,7 @@ Provide a template alias for std::generator that changes the default from an era
     \begin{minipage}[t]{0.45\columnwidth}
       \begin{minted}[fontsize=\footnotesize]{c++}
         std::pmr::monotonic_buffer_resource mbr;
-        std::pmr::polymorphic_allocator<int> pa{&mbr};
+        std::pmr::polymorphic_allocator<> pa{&mbr};
 
         std::pmr::generator<int> g
           = pmr_requiring_coroutine(
@@ -65,6 +65,8 @@ Provide a template alias for std::generator that changes the default from an era
       \end{minted}
     \end{minipage}
 \end{tabular}
+
+Implementation available at \cite{GB-IMPL:online}.
 
 \chapter{PMR is not POCMA}
 Value semantic container types must be able to propagate their allocator and extend their move and move assignment to copy from one memory arena into another. They should ensure that the objects they contain are given the allocator they hold in order to ensure consistency of allocator scope.
@@ -130,7 +132,7 @@ The proposed changes are relative to the current working draft \cite{N4917}.
     \begin{codeblock}
       namespace pmr {
         template<class R, class V = void>
-        using generator = std::generator<R, V, polymorphic_allocator<R>>;
+        using generator = std::generator<R, V, polymorphic_allocator<>>;
       }
     \end{codeblock}
     \end{addedblock}
@@ -140,6 +142,15 @@ The proposed changes are relative to the current working draft \cite{N4917}.
   \end{codeblock}
 
 \end{wording}
+
+\chapter*{Document history}
+
+\begin{itemize}
+\item \textbf{Changes since R0},
+  \begin{itemize}
+  \item Use no-arg templates for pmr::allocator.
+  \end{itemize}
+\end{itemize}
 
 \renewcommand{\bibname}{References}
 \bibliographystyle{abstract}
