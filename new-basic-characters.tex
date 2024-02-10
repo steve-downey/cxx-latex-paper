@@ -1,0 +1,177 @@
+\documentclass[a4paper,10pt,oneside,openany,final,article]{memoir}
+\input{common}
+\settocdepth{chapter}
+\usepackage{minted}
+\usepackage{fontspec}
+\usepackage{float}
+\usepackage{colortbl}
+\setromanfont{Source Serif Pro}
+\setsansfont{Source Sans Pro}
+\setmonofont{Source Code Pro}
+
+\begin{document}
+\title{Add @, \$, and \` to the basic character set}
+\author{
+  Steve Downey \small(\href{mailto:sdowney@gmail.com}{sdowney@gmail.com}) \small(\href{mailto:sdowney2@bloomberg.net}{sdowney2@bloomberg.net}) \\
+}
+\date{} %unused. Type date explicitly below.
+\maketitle
+
+\begin{flushright}
+\begin{tabular}{ll}
+Document \#: & P2558R2 \\
+Date: & \today \\
+Project: & Programming Language C++ \\
+Audience: & CWG
+\end{tabular}
+\end{flushright}
+
+\begin{abstract}
+  WG14, the C Standardization committee, is adopting \cite{@CN2701} for C23.
+
+  This will add
+
+  | Code point | Glyph | Name          |
+  |------------|-------|---------------|
+  | U+0024     | \$     | DOLLAR SIGN,  |
+  | U+0040     | \@     | COMMERCIAL AT |
+  | U+0060     | \`     | GRAVE ACCENT  |
+
+
+  to the basic source character set.
+
+\end{abstract}
+
+\tableofcontents*
+
+\chapter{Motivation}
+  These characters are available in all encoded character sets in common use and everyone assumes that they are available, using them freely in source text. The primary change would be that these characters become available for syntactic purposes. Although using \$ in identifiers is a common extension, they were not added to the identifier set in C, and this paper does not propose adding them either. Nor were trigraphs added in C for these characters, and this paper does not propose additional trigraphs or digraphs be added.
+
+  The translation model for C makes adding these to their basic source character set, the encoded set for source code before translation, much more compelling. These characters being already in the translation character set as single byte characters makes this less important for C++. Nonetheless, it would be useful to make these available for language purposes as the more conservative C language has agreed there are no functional impediments to their use.
+
+  Corentin Jabot discusses the usage in other programming languages extensively in \cite{@P2342R0}, \textit{For a Few Punctuators More}, q.v.
+
+  While it would be possible to add these characters to the grammar of C++ without adding them to the basic character set, that would violate the contract that the basic character set is sufficient for writing C and C++. Digraphs and trigraphs are concessions to ease of keyboarding. It is assumed that the characters represented by those means are available.
+
+
+\chapter{Implications and Consequences}
+
+Because this proposal is not making these characters available for syntactic purposes, the changes are limited to how these characters encoded today, or are represented in source.
+
+\section{Universal Character Names}
+
+Adding these characters to the basic source character set implies that they can no longer be spelled as universal character names outside of literals. An example of such a construct:
+\begin{codeblock}
+#include <stdio.h>
+
+#define STR(x) #x
+
+int main()
+{
+  printf("%s", STR(\u0060)); // U+0060 is ` GRAVE ACCENT
+}
+\end{codeblock}
+
+This is currently rejected by GCC 'error: universal character \u0060 is not valid in an identifier', although this seems to be a bug, and the code is accepted by clang and msvc.
+
+\section{Literal Encoding}
+Adding these characters to the basic character set means these will have to be encoded in a single byte, with positive value when used as a `char`. This is true for all POSIX encoded character sets, as @, \$, and ` are part of the portable character set. This also implies they are available in all POSIX locales, and in particular the "POSIX" locale, which is equivalent to the "C" locale. [@POSIX]
+
+See [6. Character Set](https://pubs.opengroup.org/onlinepubs/9699919799/basedefs/V1_chap06.html "6. Character Set")
+
+\section{Runtime Encoding}
+A locale that does not provide for these characters would be non-conforming. Interpreting the literal encoding in any encoded character set, including the "C" LC_CTYPE character set if it does not match the literal encoding, is already at best unspecified. Substitution ciphers are apparently conforming, although misleading. There is a long history of interpreting the Yen sign, ¥, as a path separator on Windows exactly because of these encoding aliasing issues.
+
+POSIX, which has the ultimate definition of locales and how they work, defines the [Portable Character Set](https://pubs.opengroup.org/onlinepubs/9699919799/basedefs/V1_chap06.html) that are required to be encoded. They are not invariant, and may appear in different locations in different encodings.
+
+IBM defines a portable EBCDIC set to conform with the X/Open portable character set. However, it is documented to contain Accent Acute, which is not part of the portable set defined by X/Open or POSIX. Examining EBCDIC code pages, I did not find any that did not encode U0060. \$ and @ are included in the EBCDIC [portable character set](https://www.ibm.com/docs/en/i/7.1?topic=sets-portable-character-set).
+
+\section{Source Encoding and Representation}
+There is a rule that characters in the basic character set may not be expressed as UCNs, unless inside a character or string literal. For C there are issues for characters in comments. This is not the case for C++. In non-comment contexts, these characters are currently not allowed in portable source outside of strings and character literals, so the spelling of the character is irrelevant, so other than the stringification example above, this seems unlikely to break real world code.
+
+For extensions that allow, for example, \$ in identifiers, no one outside of compiler test suites, is likely to use a UCN to spell that.
+
+C++ places no constraints on source encoding. The closest we have is the in-flight requirement that implementations that accept files be required to accept UTF-8, and UTF-8 encodes these characters.
+
+\section{Raw String Literals}
+The new characters would be allowed in the raw delimiters, as there seems no reason to exclude them. The current list of exclusions is because white space, parentheses, and back slash could cause parsing ambiguity in the paired delimiter strings.
+
+\section{Header names}
+The grammar productions for header names uses the translation character set. It is conditionally supported with implementation defined semantics if `\\` is allowed, from which we can infer that universal character names are conditionally supported. If anyone was using UCNs to represent the new characters in a header, implementations could continue to interpret them, despite the rule of UCNs not being a valid representation ongif characters in the basic character set.
+
+Footnote 14 from [lex.header]
+
+\begin{quote}
+Thus, a sequence of characters that resembles an escape sequence can result in an error, be interpreted as the character corresponding to the escape sequence, or have a completely different meaning, depending on the implementation.
+\end{quote}
+
+
+\chapter{Wording}
+
+The proposed changes are relative to the current working draft \cite{@N4917}.
+
+\begin{wording}
+
+  Modify [lex.charset] as follows:
+
+  [2]{.pnum} The basic character set is a subset of the translation character set, consisting of \changed{96}{99} characters as specified in Table 1.
+
+  Modify [tab:lex.charset.basic] with the following additions:
+
+  \begin{floattablebase}{Basic character set}{lex.charset.basic}{lll}{H}
+    \topline
+    \lhdrx{2}{character} & \rhdr{glyph} \\ \capsep
+    \ucode{0009} & \uname{character tabulation} & \\
+    \ucode{000b} & \uname{line tabulation} & \\
+    \ucode{000c} & \uname{form feed} & \\
+    \ucode{0020} & \uname{space} & \\
+    \ucode{000a} & \uname{line feed} & new-line \\
+    \ucode{0021} & \uname{exclamation mark} & \tcode{!} \\
+    \ucode{0022} & \uname{quotation mark} & \tcode{"} \\
+    \ucode{0023} & \uname{number sign} & \tcode{\#} \\
+    \rowcolor{addclr}
+    \uline{\ucode{0024}} & \uline{\uname{dollar sign}} & \uline{\tcode{\$}} \\
+    \ucode{0025} & \uname{percent sign} & \tcode{\%} \\
+    \ucode{0026} & \uname{ampersand}  & \tcode{\&} \\
+    \ucode{0027} & \uname{apostrophe} & \tcode{'} \\
+    \ucode{0028} & \uname{left parenthesis} & \tcode{(} \\
+    \ucode{0029} & \uname{right parenthesis} & \tcode{)} \\
+    \ucode{002a} & \uname{asterisk} & \tcode{*} \\
+    \ucode{002b} & \uname{plus sign} & \tcode{+} \\
+    \ucode{002c} & \uname{comma} & \tcode{,} \\
+    \ucode{002d} & \uname{hyphen-minus} & \tcode{-} \\
+    \ucode{002e} & \uname{full stop} & \tcode{.} \\
+    \ucode{002f} & \uname{solidus} & \tcode{/} \\
+    \ucode{0030} .. \ucode{0039} & \uname{digit zero .. nine} & \tcode{0 1 2 3 4 5 6 7 8 9} \\
+    \ucode{003a} & \uname{colon} & \tcode{:} \\
+    \ucode{003b} & \uname{semicolon} & \tcode{;} \\
+    \ucode{003c} & \uname{less-than sign} & \tcode{<} \\
+    \ucode{003d} & \uname{equals sign} & \tcode{=} \\
+    \ucode{003e} & \uname{greater-than sign} & \tcode{>} \\
+    \ucode{003f} & \uname{question mark} & \tcode{?} \\
+    \ucode{0041} .. \ucode{005a} & \uname{latin capital letter a .. z} & \tcode{A B C D E F G H I J K L M} \\
+    & & \tcode{N O P Q R S T U V W X Y Z} \\
+    \ucode{005b} & \uname{left square bracket} & \tcode{[} \\
+    \ucode{005c} & \uname{reverse solidus} & \tcode{\textbackslash} \\
+    \ucode{005d} & \uname{right square bracket} & \tcode{]} \\
+    \ucode{005e} & \uname{circumflex accent} & \tcode{\caret} \\
+    \ucode{005f} & \uname{low line} & \tcode{_} \\
+    \ucode{0061} .. \ucode{007a} & \uname{latin small letter a .. z} & \tcode{a b c d e f g h i j k l m} \\
+    & & \tcode{n o p q r s t u v w x y z} \\
+    \ucode{007b} & \uname{left curly bracket} & \tcode{\{} \\
+    \ucode{007c} & \uname{vertical line} & \tcode{|} \\
+    \ucode{007d} & \uname{right curly bracket} & \tcode{\}} \\
+    \ucode{007e} & \uname{tilde} & \tcode{\textasciitilde} \\
+  \end{floattablebase}
+
+
+\end{wording}
+
+
+
+\renewcommand{\bibname}{References}
+\bibliographystyle{abstract}
+\bibliography{wg21, mybiblio}
+
+
+\end{document}
